@@ -2,6 +2,8 @@
 
 <h1>Tick Tack Toe</h1>
 
+<a n:href="newGame!" class="ajax">new game</a>
+
 <div id="playboard">
 
 	{snippet board}
@@ -11,9 +13,9 @@
 
 				{foreach $row as $square}
 					{if $square->isBlank()}
-						<a n:href="makeMove! $square->getX(), $square->getY()" class="ajax square {$square->getShape()}"></a>
+						<a n:href="makeMove! $square->getX(), $square->getY()" class="ajax square"></a>
 					{else}
-						<div class="square"></div>
+						<div class="square {$square->getShape()}"></div>
 					{/if}
 				{/foreach}
 

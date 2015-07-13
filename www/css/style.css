@@ -63,3 +63,15 @@ form .error {
 	float: left;
 	border: 1px solid gray;
 }
+
+#playboard .square:hover {
+	background-color: #eee;
+}
+
+#playboard .square.circle {
+	background-color: yellow;
+}
+
+#playboard .square.cross {
+	background-color: red;
+}

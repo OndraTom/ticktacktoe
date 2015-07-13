@@ -12,6 +12,9 @@ use Nette\Application\UI\Control,
  */
 class TickTackToe extends Control
 {
+	const BOARD_SNIPPET = 'board';
+
+
 	/**
 	 * Manager of the game.
 	 *
@@ -80,8 +83,36 @@ class TickTackToe extends Control
 	}
 
 
+	/**
+	 * Redraws snippet with the board.
+	 */
+	private function redrawBoard()
+	{
+		$this->redrawControl(self::BOARD_SNIPPET);
+	}
+
+
+	/**
+	 * Handeling make move subrequest.
+	 *
+	 * @param int $x
+	 * @param int $y
+	 */
 	public function handleMakeMove($x, $y)
 	{
-		
+		$this->manager->makeMove($x, $y);
+
+		$this->redrawBoard();
+	}
+
+
+	/**
+	 * Handeling new game subrequest.
+	 */
+	public function handleNewGame()
+	{
+		$this->manager->newGame();
+
+		$this->redrawBoard();
 	}
 }

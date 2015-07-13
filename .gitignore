@@ -1,8 +1,13 @@
 log/*
 temp/*
-vendor/*
 !.gitignore
 !.htaccess
 !web.config
 app/config/config.local.neon
 /nbproject/
+/vendor/bin/
+/vendor/nette/
+/vendor/dg/
+/vendor/tracy/
+/vendor/latte/
+/vendor/composer/

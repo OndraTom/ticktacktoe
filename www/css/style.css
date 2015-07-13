@@ -48,3 +48,18 @@ form .error {
 	color: #D00;
 	font-weight: bold;
 }
+
+#playboard {
+	text-align: center;
+}
+
+#playboard .row {
+	clear: both;
+}
+
+#playboard .square {
+	width: 20px;
+	height: 20px;
+	float: left;
+	border: 1px solid gray;
+}

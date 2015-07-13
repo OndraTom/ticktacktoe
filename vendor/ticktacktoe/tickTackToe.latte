@@ -1,0 +1,25 @@
+{block content}
+
+<h1>Tick Tack Toe</h1>
+
+<div id="playboard">
+
+	{snippet board}
+		{foreach $board as $row}
+
+			<div class="row">
+
+				{foreach $row as $square}
+					{if $square->isBlank()}
+						<a n:href="makeMove! $square->getX(), $square->getY()" class="ajax square {$square->getShape()}"></a>
+					{else}
+						<div class="square"></div>
+					{/if}
+				{/foreach}
+
+			</div>
+
+		{/foreach}
+	{/snippet}
+
+</div>

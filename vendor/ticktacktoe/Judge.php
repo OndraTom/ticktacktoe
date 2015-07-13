@@ -38,4 +38,16 @@ class Judge
 		return $this->board->areValidCoordinates($x, $y)
 			&& $this->board->isSquareEmpty($x, $y);
 	}
+
+
+	/**
+	 * Checks if the given shape is valid shape.
+	 *
+	 * @param string $shape
+	 * @return bool
+	 */
+	public function isValidShape($shape)
+	{
+		return $shape == Square::SHAPE_CIRCLE || $shape == Square::SHAPE_CROSS;
+	}
 }

@@ -36,6 +36,14 @@ class Manager
 
 
 	/**
+	 * Current shape (active player).
+	 *
+	 * @var string
+	 */
+	private $currentShape = Square::SHAPE_CIRCLE;
+
+
+	/**
 	 * @param \Nette\Http\SessionSection $settings
 	 */
 	public function __construct(SessionSection $settings)
@@ -43,6 +51,44 @@ class Manager
 		$this->settings = $settings;
 		$this->board	= new Board($settings);
 		$this->judge	= new Judge($this->board);
+
+		if (isset($settings->currentShape))
+		{
+			$this->setCurrentShape($settings->currentShape);
+		}
+	}
+
+
+	/**
+	 * Sets the current shape (active player).
+	 *
+	 * @param string $shape
+	 * @throws \Exception
+	 */
+	private function setCurrentShape($shape)
+	{
+		if (false === $this->judge->isValidShape($shape))
+		{
+			throw new \Exception('Given shape "' . $shape . '" is not valid.');
+		}
+
+		$this->currentShape = $shape;
+	}
+
+
+	/**
+	 * Switching of the current shape (active player).
+	 */
+	private function switchShape()
+	{
+		if ($this->currentShape == Square::SHAPE_CIRCLE)
+		{
+			$this->currentShape = Square::SHAPE_CROSS;
+		}
+		else
+		{
+			$this->currentShape = Square::SHAPE_CIRCLE;
+		}
 	}
 
 
@@ -67,6 +113,15 @@ class Manager
 
 
 	/**
+	 * Saves current shape to the session.
+	 */
+	private function saveCurrentShape()
+	{
+		$this->settings->currentShape = $this->currentShape;
+	}
+
+
+	/**
 	 * Making the move (click on the square).
 	 *
 	 * @param int $x
@@ -81,10 +136,13 @@ class Manager
 			throw new \Exception('Move is not valid!');
 		}
 
-		// Change the square setting.
-		$this->board->makeMove($x, $y, 'circle');
-
+		// Change the board.
+		$this->board->makeMove($x, $y, $this->currentShape);
 		$this->savePlayBoard();
+
+		// Switch the shape (active player).
+		$this->switchShape();
+		$this->saveCurrentShape();
 	}
 
 
@@ -95,7 +153,6 @@ class Manager
 	{
 		// Reset the board.
 		$this->board->reset();
-
 		$this->savePlayBoard();
 	}
 }

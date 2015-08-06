@@ -3,7 +3,8 @@
 namespace TickTackToe;
 
 use Nette\Application\UI\Control,
-	Nette\Http\SessionSection;
+	Nette\Http\SessionSection,
+	Nette\Utils\Strings;
 
 /**
  * The main component of application.
@@ -12,7 +13,8 @@ use Nette\Application\UI\Control,
  */
 class TickTackToe extends Control
 {
-	const BOARD_SNIPPET = 'board';
+	const BOARD_SNIPPET		= 'board';
+	const MESSAGE_SNIPPET	= 'message';
 
 
 	/**
@@ -63,6 +65,18 @@ class TickTackToe extends Control
 
 
 	/**
+	 * Get winner announcement.
+	 *
+	 * @param	string $winner
+	 * @return	string
+	 */
+	private function getMessageForWinner($winner)
+	{
+		return Strings::capitalize($winner) . ' is the winner! Congratulations!';
+	}
+
+
+	/**
 	 * Rendering component.
 	 */
 	public function render()
@@ -70,16 +84,25 @@ class TickTackToe extends Control
 		// Check game initialization.
 		$this->checkInitialization();
 
-		// Get the template.
-		$template = $this->template;
+		// Set the playboard.
+		$this->template->board = $this->manager->getPlayBoard();
 
-		$template->board = $this->manager->getPlayBoard();
+		// Set the winner.
+		if ($this->manager->hasWinner())
+		{
+			$this->template->hasWinner	= true;
+			$this->template->message	= $this->getMessageForWinner($this->manager->getWinner());
+		}
+		else
+		{
+			$this->template->hasWinner	= false;
+		}
 
 		// Set the template file.
-		$template->setFile(__DIR__ . '/tickTackToe.latte');
+		$this->template->setFile(__DIR__ . '/tickTackToe.latte');
 
 		// Draw the content.
-		$template->render();
+		$this->template->render();
 	}
 
 
@@ -88,7 +111,22 @@ class TickTackToe extends Control
 	 */
 	private function redrawBoard()
 	{
-		$this->redrawControl(self::BOARD_SNIPPET);
+		if ($this->getPresenter()->isAjax())
+		{
+			$this->redrawControl(self::BOARD_SNIPPET);
+		}
+	}
+
+
+	/**
+	 * Redraws snippet with the message.
+	 */
+	private function redrawMessage()
+	{
+		if ($this->getPresenter()->isAjax())
+		{
+			$this->redrawControl(self::MESSAGE_SNIPPET);
+		}
 	}
 
 
@@ -103,6 +141,13 @@ class TickTackToe extends Control
 		$this->manager->makeMove($x, $y);
 
 		$this->redrawBoard();
+
+		if ($this->manager->hasWinner())
+		{
+			$this->template->message = $this->getMessageForWinner($this->manager->getWinner());
+
+			$this->redrawMessage();
+		}
 	}
 
 
@@ -114,5 +159,6 @@ class TickTackToe extends Control
 		$this->manager->newGame();
 
 		$this->redrawBoard();
+		$this->redrawMessage();
 	}
 }

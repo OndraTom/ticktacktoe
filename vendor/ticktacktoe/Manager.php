@@ -44,6 +44,14 @@ class Manager
 
 
 	/**
+	 * Winner shape.
+	 *
+	 * @var string
+	 */
+	private $winner;
+
+
+	/**
 	 * @param \Nette\Http\SessionSection $settings
 	 */
 	public function __construct(SessionSection $settings)
@@ -51,6 +59,11 @@ class Manager
 		$this->settings = $settings;
 		$this->board	= new Board($settings);
 		$this->judge	= new Judge($this->board);
+
+		if (isset($settings->winner) && $this->judge->isValidShape($settings->winner))
+		{
+			$this->winner = $settings->winner;
+		}
 
 		if (isset($settings->currentShape))
 		{
@@ -67,10 +80,7 @@ class Manager
 	 */
 	private function setCurrentShape($shape)
 	{
-		if (false === $this->judge->isValidShape($shape))
-		{
-			throw new \Exception('Given shape "' . $shape . '" is not valid.');
-		}
+		$this->judge->checkShapeValidity($shape);
 
 		$this->currentShape = $shape;
 	}
@@ -122,6 +132,41 @@ class Manager
 
 
 	/**
+	 * Sets the winner shape.
+	 *
+	 * @param string $shape
+	 */
+	private function setWinner($shape)
+	{
+		$this->settings->winner = $shape;
+
+		$this->winner = $shape;
+	}
+
+
+	/**
+	 * Returns the winner shape.
+	 *
+	 * @return string
+	 */
+	public function getWinner()
+	{
+		return $this->winner;
+	}
+
+
+	/**
+	 * Checks if game has the winner.
+	 *
+	 * @return boolean
+	 */
+	public function hasWinner()
+	{
+		return isset($this->winner);
+	}
+
+
+	/**
 	 * Making the move (click on the square).
 	 *
 	 * @param int $x
@@ -131,18 +176,24 @@ class Manager
 	public function makeMove($x, $y)
 	{
 		// Check move validity.
-		if (false === $this->judge->isMoveValid($x, $y))
-		{
-			throw new \Exception('Move is not valid!');
-		}
+		$this->judge->checkMoveValidity($x, $y);
 
 		// Change the board.
 		$this->board->makeMove($x, $y, $this->currentShape);
 		$this->savePlayBoard();
 
+		// Check and set the winner.
+		if ($this->judge->isWinner($this->currentShape, $x, $y))
+		{
+			$this->setWinner($this->currentShape);
+		}
+
 		// Switch the shape (active player).
-		$this->switchShape();
-		$this->saveCurrentShape();
+		else
+		{
+			$this->switchShape();
+			$this->saveCurrentShape();
+		}
 	}
 
 
@@ -154,5 +205,9 @@ class Manager
 		// Reset the board.
 		$this->board->reset();
 		$this->savePlayBoard();
+
+		// Unset the winner.
+		unset($this->winner);
+		unset($this->settings->winner);
 	}
 }

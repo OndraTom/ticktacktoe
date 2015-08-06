@@ -101,7 +101,7 @@ class Board
 	 */
 	public function areValidCoordinates($x, $y)
 	{
-		return isset($this->board[$y][$y]);
+		return isset($this->board[$x][$y]);
 	}
 
 
@@ -115,5 +115,24 @@ class Board
 	public function makeMove($x, $y, $shape)
 	{
 		$this->board[$x][$y]->setShape($shape);
+	}
+
+
+	/**
+	 * Gets square on given coordinates.
+	 *
+	 * @param	int		$x
+	 * @param	int		$y
+	 * @return	Square
+	 * @throws	\Exception
+	 */
+	public function getSquare($x, $y)
+	{
+		if (false === $this->areValidCoordinates($x, $y))
+		{
+			throw new \Exception('Getting shape: invalid coordinates ' . $x . ', ' . $y);
+		}
+
+		return $this->board[$x][$y];
 	}
 }

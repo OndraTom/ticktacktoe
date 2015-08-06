@@ -4,6 +4,14 @@
 
 <a n:href="newGame!" class="ajax">new game</a>
 
+<div id="message">
+	{snippet message}
+		{if isset($message)}
+			<p>{$message}</p>
+		{/if}
+	{/snippet}
+</div>
+
 <div id="playboard">
 
 	{snippet board}
@@ -13,7 +21,11 @@
 
 				{foreach $row as $square}
 					{if $square->isBlank()}
-						<a n:href="makeMove! $square->getX(), $square->getY()" class="ajax square"></a>
+						{if $hasWinner}
+							<div class="square"></div>
+						{else}
+							<a n:href="makeMove! $square->getX(), $square->getY()" class="ajax square"></a>
+						{/if}
 					{else}
 						<div class="square {$square->getShape()}"></div>
 					{/if}
